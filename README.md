@@ -7,43 +7,53 @@
 [![NetworkX](https://img.shields.io/badge/NetworkX-3.0%2B-orange.svg)](https://networkx.org/)
 [![SQLite](https://img.shields.io/badge/SQLite-SQLAlchemy_2.0-blue.svg)](https://www.sqlite.org/)
 [![License](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
-[![Zero-Hallucination](https://img.shields.io/badge/Zero--Hallucination-Enforced-emerald.svg)]()
+[![Tests](https://img.shields.io/badge/Tests-61%2F61_Passed-brightgreen.svg)](docs/reports/FINAL_TEST_RESULTS.md)
+[![AI Assistant](https://img.shields.io/badge/AI_Assistant-Database--Grounded-teal.svg)]()
+[![Security](https://img.shields.io/badge/Security-Read--Only_SQL-blueviolet.svg)]()
 
 **Repository:** [https://github.com/Abdul561561/Ashian-Spatial-AI](https://github.com/Abdul561561/Ashian-Spatial-AI)  
-**Demo Video:** *(Demonstration recording link coming soon / placeholder)*
+**Demo Video:** *(See Demonstration Video section below)*
+
+---
+
+## 📹 Demonstration Video
+
+> 📹 **Demonstration Video:** *[Video walkthrough link coming soon / placeholder]*  
+> *A comprehensive video walkthrough demonstrating automated floor plan parsing, natural language architectural queries, topological indoor pathfinding, and interactive CAD overlays will be linked here.*
 
 ---
 
 ## 1. Project Overview
 
-**Ashian Spatial AI** is an end-to-end architectural intelligence system that transforms static floor plan drawings and segmentation masks into structured spatial knowledge, conversational natural-language insights, and indoor navigation routes.
+**Ashian Spatial AI** is an architectural intelligence platform that transforms static floor plan drawings and semantic segmentation masks into structured spatial knowledge, conversational natural-language insights, and autonomous indoor navigation routes.
 
-Traditional architectural plans are static image files. Extracting structural elements, calculating areas, checking room accessibility, and performing multi-plan comparisons traditionally requires manual inspection by architects or engineers. 
+Traditional architectural CAD drawings and blueprints are static image files. Extracting structural elements, calculating areas, verifying room accessibility, and performing cross-plan comparisons traditionally requires manual inspection by architects or facility engineers.
 
-Ashian Spatial AI bridges this gap by combining:
-- **Computer Vision Extraction:** Segmenting rooms, doors, windows, and walls using morphological contour analysis and semantic mask color clustering.
-- **Relational Spatial Database:** Structuring every extracted element into an indexed SQLite database with relational schemas.
-- **Topological Navigation Engine:** Constructing room-connectivity NetworkX graphs to compute shortest paths and turn-by-turn guidance.
-- **Evidence-Backed AI Assistant:** Translating natural language questions into safe, read-only SQL queries with zero hallucination.
+Ashian Spatial AI automates and grounds this workflow through five interconnected layers:
+- **Computer Vision Extraction:** Segments rooms, doors, windows, and walls using morphological contour analysis, CVC-FP semantic mask color clustering, and topological boundary dilation.
+- **Relational Spatial Database:** Structures every extracted entity into an indexed SQLite database with relational schemas.
+- **Topological Navigation Engine:** Constructs room-connectivity NetworkX graphs to compute shortest paths and turn-by-turn guidance.
+- **Database-Grounded AI Assistant:** Translates natural language questions into safe, read-only SQL queries with evidence inspection and out-of-domain guardrails.
+- **Interactive Web Interface:** A multi-page Streamlit application providing portfolio analytics, CAD overlays, and extraction scorecards.
 
 ### Practical Applications
 - **Smart Facility & Building Management:** Automated area computation, spatial asset indexing, and occupancy planning.
-- **Indoor Autonomous Navigation & Robotics:** Wayfinding for automated guided vehicles (AGVs), service robots, and visitors in complexes.
+- **Autonomous Indoor Navigation & Robotics:** Wayfinding for automated guided vehicles (AGVs), service robots, and visitors in complexes.
 - **Emergency Egress Planning:** Computing accessible escape routes and identifying unpartitioned corridors or disconnected zones.
-- **Real Estate & Property Intelligence:** Fast semantic querying across multiple floor plans simultaneously.
+- **Real Estate & Property Intelligence:** Instant semantic querying across multiple floor plans simultaneously without manual blueprint inspection.
 
 ---
 
 ## 2. Problem Statement
 
 Static architectural CAD drawings present several operational challenges:
-1. **Manual Room & Asset Identification:** Cataloging rooms, doors, and facade openings is labor-intensive.
+1. **Manual Room & Asset Identification:** Cataloging rooms, doors, and facade openings is labor-intensive and prone to human error.
 2. **Opaque Spatial Connectivity:** Determining if two rooms are directly or transitively connected requires tracing corridors manually.
-3. **Cross-Plan Querying Bottlenecks:** Answering questions across multiple floor plans requires opening each file individually.
+3. **Cross-Plan Querying Bottlenecks:** Answering questions across multiple floor plans requires opening and reading each blueprint individually.
 4. **Lack of Interactive Indoor Navigation:** Static blueprints cannot compute turn-by-turn routing between interior spaces.
 5. **Hallucination Risk in Architectural AI:** Generic LLMs often invent room dimensions, door connections, or materials.
 
-Ashian Spatial AI addresses these problems through deterministic computer vision parsing, relational SQL persistence, and strict zero-hallucination protocols.
+Ashian Spatial AI addresses these problems through deterministic computer vision parsing, relational SQL persistence, and strict database grounding protocols.
 
 ---
 
@@ -52,23 +62,39 @@ Ashian Spatial AI addresses these problems through deterministic computer vision
 ### A. Computer Vision-Based Floor Plan Extraction
 - Multi-class color clustering against CVC-FP palette standards.
 - Contour detection, polygonization, pixel area computation, bounding boxes, and centroids.
-- Automated classification separating habitable living rooms from exterior sills, service areas, and balconies.
+- Automated classification separating habitable living rooms from exterior sills, service areas, corridors, and balconies.
 - Morphological dilation of door thresholds to detect physical door-room adjacency.
 - Structural wall partition extraction and facade window detection.
 - Extraction Confidence Score (0–100%) and automated data validation status.
 
-### B. Interactive Floor Plan Explorer
+### B. Spatial Region vs. Habitable Room Accounting
+A critical distinction in architectural computer vision is separating **total detected spatial regions** (connected components in segmentation masks) from **actual habitable rooms**:
+- **Floor Plan #1**: Reports **14 total detected spatial regions**:
+  - 11 Habitable Living Rooms / Bedrooms / Kitchen
+  - 1 Bathroom / WC Service Space
+  - 1 Corridor / Circulation Space
+  - 1 Exterior Balcony
+- **Floor Plan #20**: Reports **36 total detected spatial regions**:
+  - 15 Primary Habitable Rooms
+  - 1 Corridor / Circulation Area
+  - 3 Bathroom / Service Spaces
+  - 17 Exterior Sill / Balcony Fragments (resulting from fine-grained perimeter annotations in CVC-FP masks)
+  - **Zero Fabricated Doors:** The ground-truth mask for Plan 20 contains 0 interior door annotations. Our system strictly respects the source data and reports 0 door connections without inventing phantom portals.
+
+For a detailed visual and algorithmic analysis, see [ROOM_COUNT_ACCURACY_REPORT.md](docs/reports/ROOM_COUNT_ACCURACY_REPORT.md).
+
+### C. Interactive Floor Plan Explorer
 - Visual overlays rendered over original floor plans with adjustable opacity.
 - Multi-tab inspection: Annotated Visual Overlay, Original CAD Drawing, Raw Segmentation Mask, Extracted Rooms Data Table with CSV export, and Doors & Windows inventory.
 - Interactive individual room highlighting with real-time bounding box and metric cards.
 
-### C. AI Architectural Assistant
+### D. Database-Grounded AI Assistant
 - Natural language query understanding powered by OpenRouter LLM APIs with multi-tier deterministic fallback.
-- Read-only SQL safety validator strictly blocking destructive operations (`DROP`, `DELETE`, `UPDATE`, `INSERT`).
+- Read-only SQL safety validator strictly blocking destructive operations (`DROP`, `DELETE`, `UPDATE`, `INSERT`, `ALTER`, `TRUNCATE`).
 - Transparent technical inspection container exposing the generated SQL query, execution engine provenance, and raw database rows.
-- Strict zero-hallucination policy: gracefully declines questions lacking underlying data (e.g., construction costs, architect names).
+- Strict database grounding: gracefully declines questions lacking underlying data (e.g., construction costs, architect names, HVAC systems).
 
-### D. Indoor Navigation & Pathfinding
+### E. Indoor Navigation & Pathfinding
 - Topological NetworkX room-connectivity graph construction.
 - Dijkstra shortest-path calculations weighted by Euclidean centroid distance.
 - High-contrast, turn-by-turn guidance cards detailing step-by-step room and door transitions.
@@ -76,13 +102,13 @@ Ashian Spatial AI addresses these problems through deterministic computer vision
 - Automated entrance routing (`From Main Entrance`).
 - Zero-fabrication enforcement: disconnected sectors (such as Plan 20) are accurately reported as partitioned spaces without inventing phantom portals.
 
-### E. Building Spatial Analytics
+### F. Building Spatial Analytics
 - Interactive room area distribution charts.
 - Functional typology composition pie and donut charts.
 - Room compactness (solidity) versus aspect ratio scatter plots.
 - Aggregate metrics: mean, median, min, and max room dimensions.
 
-### F. Architectural Extraction Reports
+### G. Architectural Extraction Reports
 - 10-metric extraction scorecard summarizing building composition.
 - Element inventories for rooms, doors, windows, and structural walls.
 - Instant CSV and JSON export options for downstream CAD and BIM pipelines.
@@ -96,36 +122,38 @@ flowchart TD
     subgraph CV["1. Computer Vision Pipeline"]
         A["Original Floor Plan (data/raw/X)"] --> C["FloorPlanLoader"]
         B["Segmentation Mask (data/raw/Y)"] --> C
-        C --> D["MaskInspector<br>(Color Distance Clustering)"]
-        D --> E["FloorPlanExtractor<br>(Contour & Morphology)"]
-        E --> F["Topological Boundary Dilation<br>(Door Adjacency)"]
+        C --> D["MaskInspector: Color Distance Clustering"]
+        D --> E["FloorPlanExtractor: Contour and Morphology"]
+        E --> F["Topological Boundary Dilation: Door Adjacency"]
     end
 
     subgraph DB["2. Relational Database Layer"]
-        F --> G["DatabaseManager (SQLite)"]
-        G --> G1["floor_plans"]
-        G --> G2["rooms"]
-        G --> G3["doors & windows"]
-        G --> G4["room_connections"]
-        G --> G5["extraction_metadata"]
+        F --> G["DatabaseManager: SQLite Spatial Storage"]
+        G --> G1["floor_plans: CAD Dimensions and Metadata"]
+        G --> G2["rooms: Typology, Centroids, and Pixel Areas"]
+        G --> G3["doors and windows: Portals and Facade Openings"]
+        G --> G4["room_connections: Door-Linked Adjacent Rooms"]
+        G --> G5["extraction_metadata: Audit Scorecards"]
     end
 
-    subgraph Graph["3. Spatial Intelligence"]
-        G2 & G4 --> H["SpatialGraphBuilder<br>(NetworkX Undirected Graph)"]
-        H --> I["IndoorNavigator<br>(Dijkstra Routing)"]
-        I --> J["Visualizer<br>(Route & Element Overlays)"]
+    subgraph Graph["3. Spatial Intelligence Engine"]
+        G2 --> H["SpatialGraphBuilder: NetworkX Undirected Graph"]
+        G4 --> H
+        H --> I["IndoorNavigator: Dijkstra Shortest Path"]
+        I --> J["Visualizer: Route and Element Overlays"]
     end
 
-    subgraph AI["4. Secure AI Engine"]
-        K["User Question"] --> L["QueryEngine / OpenRouter"]
-        L --> M["SQLValidator<br>(Read-Only Enforcement)"]
-        M -->|Approved| N["Execute SQL Query"]
-        M -->|Blocked / Unsupported| O["Decline with Safe Disclosure"]
-        N --> P["Evidence-Backed Answer"]
+    subgraph AI["4. Database-Grounded AI Engine"]
+        K["User Natural Language Question"] --> L["QueryEngine: OpenRouter LLM or Deterministic Engine"]
+        L --> M["SQLValidator: Read-Only Query Enforcement"]
+        M -->|Approved| N["Execute Safe Read-Only SQL"]
+        M -->|Blocked or Unsupported| O["Decline with Grounded Disclosure"]
+        N --> P["Evidence-Backed Answer with SQL Trace"]
     end
 
     subgraph UI["5. Streamlit Presentation Layer"]
-        J & P --> Q["Streamlit Interactive UI<br>(Dashboard, Explorer, Assistant, Navigation, Analytics, Reports)"]
+        J --> Q["Streamlit Interactive UI: Dashboard, Explorer, Assistant, Navigation, Analytics, Reports"]
+        P --> Q
     end
 ```
 
@@ -179,6 +207,7 @@ ASHIAN SPATIAL AI/
 ├── app.py                     # Streamlit application entry point (6 modules)
 ├── config.py                  # Global project configuration & palette definition
 ├── requirements.txt           # Python package dependencies
+├── LICENSE                    # MIT License
 ├── .env.example               # Template environment configuration
 ├── .gitignore                 # Git ignore rules
 ├── data/
@@ -187,6 +216,14 @@ ASHIAN SPATIAL AI/
 │   │   └── Y/                 # Multi-class ground-truth segmentation masks
 │   └── spatial_ai.db          # Pre-populated SQLite spatial database (20 plans)
 ├── docs/
+│   ├── reports/               # Verified technical audit & functionality reports
+│   │   ├── BUG_FIX_REPORT.md
+│   │   ├── FINAL_AUDIT_REPORT.md
+│   │   ├── FINAL_PROJECT_STATUS.md
+│   │   ├── FINAL_TEST_RESULTS.md
+│   │   ├── FUNCTIONALITY_FIX_REPORT.md
+│   │   ├── PROJECT_AUDIT_REPORT.md
+│   │   └── ROOM_COUNT_ACCURACY_REPORT.md
 │   ├── screenshots/           # Verified UI module screenshots
 │   └── overlays/              # Generated high-resolution annotated visual overlays
 ├── scripts/
@@ -214,14 +251,14 @@ ASHIAN SPATIAL AI/
 │       ├── components.py      # Reusable Streamlit cards and badges
 │       └── styles.py          # Custom CSS styling and typography
 └── tests/
-    ├── test_loader.py         # Dataset loading tests
-    ├── test_cv_extractor.py   # Computer vision extraction tests
-    ├── test_database.py       # Relational database persistence tests
-    ├── test_sql_safety.py     # SQL injection and read-only validator tests
-    ├── test_navigation.py     # Topological graph & navigation contract tests
-    ├── test_qa_assistant.py   # AI Assistant 20-question benchmark suite
-    ├── test_functionality_fixes.py # Core assignment inquiry & guardrail tests
-    └── test_room_counting_accuracy.py # Room segmentation accuracy tests
+    ├── test_loader.py         # Dataset loading tests (3 tests)
+    ├── test_cv_extractor.py   # Computer vision extraction tests (3 tests)
+    ├── test_database.py       # Relational database persistence tests (2 tests)
+    ├── test_sql_safety.py     # SQL injection & read-only validator tests (4 tests)
+    ├── test_navigation.py     # Topological graph & navigation contract tests (4 tests)
+    ├── test_qa_assistant.py   # AI Assistant 20-question benchmark suite (20 tests)
+    ├── test_functionality_fixes.py # Core assignment inquiry & guardrail tests (12 tests)
+    └── test_room_counting_accuracy.py # Room segmentation accuracy tests (13 tests)
 ```
 
 ---
@@ -277,7 +314,7 @@ PROCESSED_DATA_DIR=data/processed
 OUTPUT_DIR=outputs
 LOG_LEVEL=INFO
 ```
-*(Note: A free API key can be obtained at [OpenRouter](https://openrouter.ai/). If no API key is provided, the system seamlessly runs on its deterministic, zero-hallucination local rule engine).*
+*(Note: A free API key can be obtained at [OpenRouter](https://openrouter.ai/). If no API key is provided, the system seamlessly runs on its deterministic, database-grounded local rule engine).*
 
 ---
 
@@ -301,7 +338,7 @@ To stop the application, press `Ctrl + C` in your terminal.
 
 | Module | Purpose | Key Capabilities |
 | :--- | :--- | :--- |
-| **🏢 Dashboard** | Executive building portfolio overview | KPI metric cards (Plans, Rooms, Doors, Quality), CAD index table, and system pipeline. |
+| **🏢 Dashboard** | Executive building portfolio overview | KPI metric cards (Plans, Rooms, Doors, Quality), CAD index table, and system pipeline overview. |
 | **🗺️ Floor Plan Explorer** | Interactive architectural CAD inspection | Multi-class overlays, raw CAD drawings, segmentation masks, room highlighting, and inventory tables. |
 | **💬 AI Assistant** | Grounded architectural Q&A | Natural language queries, read-only SQL translation, evidence inspector, and zero-hallucination guardrails. |
 | **🧭 Indoor Navigation** | Topological indoor pathfinding | Dijkstra shortest-path calculations, high-contrast step-by-step guidance cards, and visual route overlays. |
@@ -312,7 +349,7 @@ To stop the application, press `Ctrl + C` in your terminal.
 
 ## 11. Example AI Assistant Questions
 
-The AI Assistant responds to questions using database records:
+The AI Assistant responds to questions strictly using verified database records:
 
 | Category | Example Question | Supported Answer / Behavior |
 | :--- | :--- | :--- |
@@ -350,8 +387,8 @@ The indoor navigation engine computes topological shortest paths using NetworkX 
 
 ## 13. Screenshots & Visual Documentation
 
-### Application Interface
-| Module | Screenshot |
+### Application Interface Modules
+| Module | Interface Screenshot |
 | :--- | :--- |
 | **🏢 Dashboard** | ![Dashboard](docs/screenshots/01_dashboard.png) |
 | **🗺️ Floor Plan Explorer** | ![Floor Plan Explorer](docs/screenshots/02_floor_plan_explorer.png) |
@@ -377,14 +414,21 @@ pytest -v
 ```
 
 ### Verified Test Results: **61 Passed / 61 Total (100% Green)**
-- `tests/test_loader.py` (3 tests): Image and mask loading, dimensions, pairing.
-- `tests/test_cv_extractor.py` (3 tests): Segmentation mask inspection, room contour extraction, visual overlays.
-- `tests/test_database.py` (2 tests): SQLite table creation, foreign keys, read-only SQL queries.
-- `tests/test_sql_safety.py` (4 tests): Prevention of destructive commands (`DROP`, `DELETE`), injection blocking, table whitelisting.
-- `tests/test_navigation.py` (4 tests): Response schema consistency, multi-step routes, same-room routes, disconnected sectors, Plan 20 zero fabrication.
-- `tests/test_qa_assistant.py` (20 tests): 20 comprehensive architectural questions with verified database ground truth.
-- `tests/test_functionality_fixes.py` (12 tests): Window entity extraction, core take-home assignment queries, and out-of-domain guardrail prompts.
-- `tests/test_room_counting_accuracy.py` (13 tests): Room count validation, spatial region versus habitable room accounting, centroid uniqueness, and bounding box disjointness.
+
+| Test Suite File | Tests | Purpose & Coverage |
+| :--- | :---: | :--- |
+| `tests/test_loader.py` | 3 | Image and mask loading, dimensions, pairing |
+| `tests/test_cv_extractor.py` | 3 | Segmentation mask inspection, room contour extraction, visual overlays |
+| `tests/test_database.py` | 2 | SQLite table creation, foreign keys, read-only SQL queries |
+| `tests/test_sql_safety.py` | 4 | Prevention of destructive commands (`DROP`, `DELETE`), injection blocking, table whitelisting |
+| `tests/test_navigation.py` | 4 | Response schema consistency, multi-step routes, same-room routes, disconnected sectors, Plan 20 zero fabrication |
+| `tests/test_qa_assistant.py` | 20 | 20 comprehensive architectural questions with verified database ground truth |
+| `tests/test_functionality_fixes.py` | 12 | Window entity extraction, core take-home assignment queries, and out-of-domain guardrail prompts |
+| `tests/test_room_counting_accuracy.py` | 13 | Room count validation, spatial region versus habitable room accounting, centroid uniqueness, and bounding box disjointness |
+| **Total Verified** | **61** | **All 61 tests passing (100% pass rate)** |
+
+> **Audit Test Count Reconciliation:**  
+> The original baseline audit test suite comprised 58 tests. During navigation hardening (Bug-10 resolution), 3 regression tests (`test_real_plan_1_navigation_scenarios`, `test_real_plan_20_zero_fabrication`, `test_visualizer_navigation_overlay_modes`) were added to `tests/test_navigation.py` to prevent route key regressions, expanding the verified suite to 61/61 passing tests. For the full audit history and individual test names, see [FINAL_TEST_RESULTS.md](docs/reports/FINAL_TEST_RESULTS.md).
 
 ---
 
@@ -417,7 +461,7 @@ pytest -v
 | **Visual Overlays** | Publication-grade overlays rendered with pastel fills, doors, windows, and labels. | **COMPLETED** |
 | **Database-Grounded AI Assistant** | OpenRouter LLM + deterministic fallback; answers strictly grounded in database. | **COMPLETED** |
 | **SQL Transparency** | Expandable technical details showing executed SQL and raw record rows. | **COMPLETED** |
-| **Zero-Hallucination Protocol** | Explicit disclosures on scale calibration and declining out-of-domain queries. | **COMPLETED** |
+| **Grounding & Guardrail Protocols** | Explicit disclosures on scale calibration and declining out-of-domain queries. | **COMPLETED** |
 | **Indoor Navigation Extension** | NetworkX topological room graphs with Dijkstra routing and step-by-step guidance. | **COMPLETED** |
 
 ---
@@ -430,7 +474,23 @@ pytest -v
 
 ---
 
-## 19. Developer Information
+## 19. GitHub Repository Configuration Guide
+
+For the repository maintainer configuring [https://github.com/Abdul561561/Ashian-Spatial-AI](https://github.com/Abdul561561/Ashian-Spatial-AI):
+
+### Repository About Description
+```text
+AI-powered architectural floor plan analysis using computer vision, SQLite, LLM-based querying, and graph-based indoor navigation.
+```
+
+### Suggested Repository Topics
+```text
+computer-vision, floor-plan-analysis, indoor-navigation, spatial-ai, dijkstra-algorithm, networkx, sqlite, streamlit, architectural-ai, opencv, python, cad-analysis
+```
+
+---
+
+## 20. Developer Information
 
 - **Project:** Ashian Spatial AI
 - **Repository:** [https://github.com/Abdul561561/Ashian-Spatial-AI](https://github.com/Abdul561561/Ashian-Spatial-AI)
